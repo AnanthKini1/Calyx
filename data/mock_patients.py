@@ -6,6 +6,8 @@ Replaces real APIs (Dexcom, lab results, accelerometers) with
 realistic clinical scenarios for demo/development purposes.
 """
 
+from __future__ import annotations
+
 from datetime import date, timedelta
 
 # ---------------------------------------------------------------------------
