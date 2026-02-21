@@ -14,7 +14,9 @@ import tempfile
 import cv2
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+_UTIL = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_UTIL, "..", ".."))  # project root
+sys.path.insert(0, os.path.join(_UTIL, ".."))        # frontend root
 
 from vision import analyze_image
 from knowledge_graph.reasoning import evaluate_healing

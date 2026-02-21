@@ -8,8 +8,11 @@ Run with:
 import sys
 import os
 
-# Ensure project root is on the path so vision / knowledge_graph import cleanly
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+_HERE = os.path.dirname(os.path.abspath(__file__))
+# Project root → vision, knowledge_graph, data packages
+sys.path.insert(0, os.path.join(_HERE, ".."))
+# Frontend root → styles, components, utils packages
+sys.path.insert(0, _HERE)
 
 import streamlit as st
 

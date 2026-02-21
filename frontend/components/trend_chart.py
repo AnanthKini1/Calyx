@@ -12,7 +12,9 @@ from __future__ import annotations
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+_COMP = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_COMP, "..", ".."))  # project root
+sys.path.insert(0, os.path.join(_COMP, ".."))        # frontend root
 
 import streamlit as st
 
