@@ -1,0 +1,256 @@
+[
+  {
+    "patient_id": "P001",
+    "name": "Maria Santos",
+    "age": 54,
+    "comorbidities": [
+      "Hypertension"
+    ],
+    "blood_glucose": 112.0,
+    "serum_albumin": 3.8,
+    "mobility_score": 7,
+    "post_op_day": 10,
+    "wound_history": [
+      {
+        "date": "2026-02-11",
+        "area_cm2": 8.2,
+        "ryb_ratios": {
+          "red": 42.0,
+          "yellow": 38.0,
+          "black": 20.0
+        }
+      },
+      {
+        "date": "2026-02-13",
+        "area_cm2": 6.9,
+        "ryb_ratios": {
+          "red": 52.0,
+          "yellow": 32.0,
+          "black": 16.0
+        }
+      },
+      {
+        "date": "2026-02-16",
+        "area_cm2": 5.4,
+        "ryb_ratios": {
+          "red": 63.0,
+          "yellow": 28.0,
+          "black": 9.0
+        }
+      },
+      {
+        "date": "2026-02-18",
+        "area_cm2": 4.1,
+        "ryb_ratios": {
+          "red": 72.0,
+          "yellow": 22.0,
+          "black": 6.0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 3.1,
+        "ryb_ratios": {
+          "red": 78.0,
+          "yellow": 18.0,
+          "black": 4.0
+        }
+      }
+    ]
+  },
+  {
+    "patient_id": "P002",
+    "name": "James Okafor",
+    "age": 67,
+    "comorbidities": [
+      "Type 2 Diabetes",
+      "Obesity",
+      "Hypertension"
+    ],
+    "blood_glucose": 224.0,
+    "serum_albumin": 2.4,
+    "mobility_score": 2,
+    "post_op_day": 21,
+    "wound_history": [
+      {
+        "date": "2026-01-31",
+        "area_cm2": 12.1,
+        "ryb_ratios": {
+          "red": 55.0,
+          "yellow": 32.0,
+          "black": 13.0
+        }
+      },
+      {
+        "date": "2026-02-04",
+        "area_cm2": 13.4,
+        "ryb_ratios": {
+          "red": 52.0,
+          "yellow": 34.0,
+          "black": 14.0
+        }
+      },
+      {
+        "date": "2026-02-09",
+        "area_cm2": 12.8,
+        "ryb_ratios": {
+          "red": 51.0,
+          "yellow": 31.0,
+          "black": 18.0
+        }
+      },
+      {
+        "date": "2026-02-15",
+        "area_cm2": 13.1,
+        "ryb_ratios": {
+          "red": 53.0,
+          "yellow": 28.0,
+          "black": 19.0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 13.5,
+        "ryb_ratios": {
+          "red": 58.0,
+          "yellow": 24.0,
+          "black": 18.0
+        }
+      }
+    ]
+  },
+  {
+    "patient_id": "P003",
+    "name": "Linda Chu",
+    "age": 61,
+    "comorbidities": [
+      "Type 2 Diabetes"
+    ],
+    "blood_glucose": 155.0,
+    "serum_albumin": 3.2,
+    "mobility_score": 3,
+    "post_op_day": 16,
+    "wound_history": [
+      {
+        "date": "2026-02-05",
+        "area_cm2": 9.5,
+        "ryb_ratios": {
+          "red": 44.0,
+          "yellow": 41.0,
+          "black": 15.0
+        }
+      },
+      {
+        "date": "2026-02-09",
+        "area_cm2": 8.9,
+        "ryb_ratios": {
+          "red": 48.0,
+          "yellow": 38.0,
+          "black": 14.0
+        }
+      },
+      {
+        "date": "2026-02-13",
+        "area_cm2": 8.4,
+        "ryb_ratios": {
+          "red": 51.0,
+          "yellow": 36.0,
+          "black": 13.0
+        }
+      },
+      {
+        "date": "2026-02-17",
+        "area_cm2": 8.1,
+        "ryb_ratios": {
+          "red": 53.0,
+          "yellow": 35.0,
+          "black": 12.0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 7.8,
+        "ryb_ratios": {
+          "red": 55.0,
+          "yellow": 33.0,
+          "black": 12.0
+        }
+      }
+    ]
+  },
+  {
+    "patient_id": "P004",
+    "name": "Robert Vance",
+    "age": 73,
+    "comorbidities": [
+      "Type 2 Diabetes",
+      "Peripheral Artery Disease",
+      "Obesity"
+    ],
+    "blood_glucose": 198.0,
+    "serum_albumin": 2.7,
+    "mobility_score": 1,
+    "post_op_day": 8,
+    "wound_history": [
+      {
+        "date": "2026-02-13",
+        "area_cm2": 15.3,
+        "ryb_ratios": {
+          "red": 60.0,
+          "yellow": 32.0,
+          "black": 8.0
+        }
+      },
+      {
+        "date": "2026-02-16",
+        "area_cm2": 15.9,
+        "ryb_ratios": {
+          "red": 55.0,
+          "yellow": 29.0,
+          "black": 16.0
+        }
+      },
+      {
+        "date": "2026-02-18",
+        "area_cm2": 16.4,
+        "ryb_ratios": {
+          "red": 51.0,
+          "yellow": 27.0,
+          "black": 22.0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 17.1,
+        "ryb_ratios": {
+          "red": 47.0,
+          "yellow": 31.0,
+          "black": 22.0
+        }
+      }
+    ]
+  },
+  {
+    "patient_id": "PE4A46B",
+    "name": "Ananth Kini",
+    "age": 36,
+    "comorbidities": [
+      "Obesity"
+    ],
+    "blood_glucose": 110.0,
+    "serum_albumin": 3.8,
+    "mobility_score": 7,
+    "post_op_day": 7,
+    "wound_history": [
+      {
+        "date": "2026-02-21",
+        "area_cm2": 75.33,
+        "ryb_ratios": {
+          "red": 100.0,
+          "yellow": 0.0,
+          "black": 0.0
+        }
+      }
+    ]
+  }
+]

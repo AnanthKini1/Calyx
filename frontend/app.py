@@ -1,10 +1,10 @@
 """
-app.py — ChroniScan Streamlit frontend entry point.
+app.py — ChroniScan entry point and role-based router.
 
-Routing:
-  • No patient_id in session → login/register page (full screen)
-  • patient_id set, page == "scan"    → scan page (camera + results)
-  • patient_id set, page == "history" → history page (chart + table)
+Session state keys:
+  user_id   — patient_id or doctor_id of the logged-in user
+  user_role — "patient" | "doctor"
+  page      — active page key (role-specific)
 
 Run with:
     streamlit run frontend/app.py
@@ -14,20 +14,11 @@ import sys
 import os
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(_HERE, ".."))  # project root
-sys.path.insert(0, _HERE)                       # frontend root
+sys.path.insert(0, os.path.join(_HERE, ".."))   # project root
+sys.path.insert(0, _HERE)                        # frontend root
 
 import streamlit as st
-
 from styles.theme import inject_css
-from pages.login import render_login_page
-from pages.scan import render_scan_page
-from pages.history import render_history_page
-from components.profile_sidebar import render_profile_sidebar
-
-# ---------------------------------------------------------------------------
-# Page config — must be first Streamlit call
-# ---------------------------------------------------------------------------
 
 st.set_page_config(
     page_title="ChroniScan",
@@ -35,34 +26,73 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
 inject_css()
 
 # ---------------------------------------------------------------------------
 # Route
 # ---------------------------------------------------------------------------
 
-patient_id = st.session_state.get("patient_id")
+user_id   = st.session_state.get("user_id")
+user_role = st.session_state.get("user_role")
 
-if not patient_id:
-    # ── Unauthenticated — full-screen login ───────────────────────────────────
-    # Hide sidebar entirely on login screen
+# ── Unauthenticated ───────────────────────────────────────────────────────────
+if not user_id:
     st.markdown(
         "<style>[data-testid='stSidebar'] { display: none; }</style>",
         unsafe_allow_html=True,
     )
-    render_login_page()
-
-else:
-    # ── Authenticated — sidebar + page router ─────────────────────────────────
-    with st.sidebar:
-        current_page = render_profile_sidebar(patient_id)
-
-    st.session_state["page"] = current_page
-
-    if current_page == "scan":
-        render_scan_page(patient_id)
-    elif current_page == "history":
-        render_history_page(patient_id)
+    page = st.session_state.get("page")
+    if page == "create_profile":
+        from pages.create_profile import render_create_profile_page
+        render_create_profile_page()
     else:
-        render_scan_page(patient_id)
+        from pages.login import render_login_page
+        render_login_page()
+
+# ── Patient ───────────────────────────────────────────────────────────────────
+elif user_role == "patient":
+    from components.patient_sidebar import render_patient_sidebar
+    from pages.patient.scan import render_scan_page
+    from pages.patient.history import render_history_page
+    from pages.patient.growth import render_growth_page
+    from pages.patient.import_history import render_import_page
+
+    with st.sidebar:
+        current = render_patient_sidebar(user_id)
+    st.session_state["page"] = current
+
+    if current == "scan":
+        render_scan_page(user_id)
+    elif current == "history":
+        render_history_page(user_id)
+    elif current == "growth":
+        render_growth_page(user_id)
+    elif current == "import":
+        render_import_page(user_id)
+    else:
+        render_scan_page(user_id)
+
+# ── Doctor ────────────────────────────────────────────────────────────────────
+elif user_role == "doctor":
+    from components.doctor_sidebar import render_doctor_sidebar
+    from pages.doctor.overview import render_overview_page
+    from pages.doctor.alerts import render_alerts_page
+    from pages.doctor.patient_detail import render_patient_detail_page
+
+    with st.sidebar:
+        current = render_doctor_sidebar(user_id)
+    st.session_state["page"] = current
+
+    selected_pid = st.session_state.get("selected_patient_id")
+
+    if current == "patient_detail" and selected_pid:
+        render_patient_detail_page(selected_pid)
+    elif current == "alerts":
+        render_alerts_page(user_id)
+    else:
+        render_overview_page(user_id)
+
+# ── Bad state — clear and restart ─────────────────────────────────────────────
+else:
+    st.session_state.clear()
+    st.rerun()

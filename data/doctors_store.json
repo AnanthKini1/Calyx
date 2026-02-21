@@ -1,0 +1,14 @@
+[
+  {
+    "doctor_id": "D001",
+    "role": "doctor",
+    "name": "Dr. Priya Nair",
+    "specialty": "Wound Care & Surgery",
+    "patient_ids": [
+      "P001",
+      "P002",
+      "P003",
+      "P004"
+    ]
+  }
+]
