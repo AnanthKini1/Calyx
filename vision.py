@@ -77,31 +77,59 @@ def compute_scale(radius_px: float, real_diam_cm: float = COIN_REAL_DIAM_CM) -> 
 
 def detect_wound_mask(img: np.ndarray) -> np.ndarray:
     """
-    Isolate the wound region by masking red pixels in HSV space.
+    Isolate the wound region by masking wound-coloured pixels in HSV space.
 
-    Red wraps around the hue wheel, so two ranges are combined:
-      - Lower red: H ∈ [0, 10]
-      - Upper red: H ∈ [160, 180]
+    Captures three tissue colour ranges:
+      - Red (granulation): H ∈ [0, 10] or H ∈ [160, 180], S ≥ 120
+        S threshold raised to 120 (from 100) to exclude typical skin tones
+        (fair/medium skin sits at S ≈ 80-110, well below true wound tissue).
+      - Yellow (slough): H ∈ [15, 38], S ≥ 100, V ≥ 100
+        Slough was entirely invisible to the old red-only mask.
 
     Returns a cleaned binary uint8 mask (255 = wound, 0 = background).
     """
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    lower_red1 = np.array([0,   100, 80])
-    upper_red1 = np.array([10,  255, 255])
-    lower_red2 = np.array([160, 100, 80])
-    upper_red2 = np.array([180, 255, 255])
-
-    mask = cv2.bitwise_or(
-        cv2.inRange(hsv, lower_red1, upper_red1),
-        cv2.inRange(hsv, lower_red2, upper_red2),
+    # Red — granulation / necrosis borders (wraps around hue wheel)
+    # S ≥ 120 keeps us away from skin-tone saturation range (~80-110)
+    red_mask = cv2.bitwise_or(
+        cv2.inRange(hsv, np.array([0,   120, 80]),  np.array([10,  255, 255])),
+        cv2.inRange(hsv, np.array([160, 120, 80]),  np.array([180, 255, 255])),
     )
+
+    # Yellow — slough (fibrinous coating over wound bed)
+    # S ≥ 100 excludes pale/washed-out skin tones
+    yellow_mask = cv2.inRange(hsv, np.array([15, 100, 100]), np.array([38, 255, 255]))
+
+    mask = cv2.bitwise_or(red_mask, yellow_mask)
 
     # Morphological cleanup: close small gaps, remove noise
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN,  kernel, iterations=1)
     return mask
+
+
+def is_wound_present(mask: np.ndarray, img_shape: tuple, min_pixels: int = 500) -> bool:
+    """
+    Heuristic guard: return True only when the mask looks like a real wound.
+
+    Two failure modes are rejected:
+      - Too few pixels  (<min_pixels) — noise or artefact, not a wound.
+      - Too much coverage (>40% of image) — the detector grabbed the whole
+        hand or background instead of an isolated wound region.
+
+    min_pixels default of 500 corresponds to roughly a 22×22 px square,
+    which at 0.026 cm/px (smartphone fallback) is about 0.34 cm² — well
+    below any clinically relevant wound, so genuine wounds are never excluded.
+    """
+    wound_px = int(np.sum(mask == 255))
+    if wound_px < min_pixels:
+        return False
+    total_px = img_shape[0] * img_shape[1]
+    if wound_px / total_px > 0.40:
+        return False
+    return True
 
 
 def compute_wound_area(
@@ -260,6 +288,28 @@ def draw_overlay(
     return out
 
 
+def _make_no_wound_overlay(img: np.ndarray) -> np.ndarray:
+    """
+    Return an annotated copy of *img* indicating no wound was found.
+
+    Used when is_wound_present() rejects the mask so Streamlit always has
+    a displayable image rather than a raw uninformative frame.
+    """
+    out = img.copy()
+    w = out.shape[1]
+    # Semi-transparent dark bar at top
+    overlay = out.copy()
+    cv2.rectangle(overlay, (0, 0), (w, 46), (20, 20, 20), -1)
+    cv2.addWeighted(overlay, 0.65, out, 0.35, 0, out)
+
+    msg = "No wound detected"
+    cv2.putText(out, msg, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 3, cv2.LINE_AA)
+    cv2.putText(out, msg, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (60, 220, 60),  1, cv2.LINE_AA)
+    return out
+
+
 def _make_demo_overlay(scan: dict, patient: dict) -> np.ndarray:
     """
     Generate a synthetic wound image from mock data when no real photo exists.
@@ -355,6 +405,19 @@ def analyze_image(
 
     # --- Wound segmentation ---
     mask = detect_wound_mask(img)
+
+    # --- Guard: reject bare skin and noise ---
+    if not is_wound_present(mask, img.shape):
+        return {
+            "area_cm2":        0.0,
+            "ryb_ratios":      {"red": 0.0, "yellow": 0.0, "black": 0.0},
+            "annotated_image": _make_no_wound_overlay(img),
+            "coin_found":      coin is not None,
+            "scale_cm_per_px": cm_per_px,
+            "wound_detected":  False,
+            "message":         "No wound detected",
+        }
+
     area_cm2, contour = compute_wound_area(mask, cm_per_px)
 
     # --- RYB tissue analysis ---
@@ -380,6 +443,69 @@ def analyze_image(
         "annotated_image": annotated,
         "coin_found":      coin is not None,
         "scale_cm_per_px": cm_per_px,
+        "wound_detected":  True,
+        "message":         "Wound detected",
+    }
+
+
+def analyze_frame(
+    frame: np.ndarray,
+    coin_diam_cm: float = COIN_REAL_DIAM_CM,
+) -> dict:
+    """
+    Real-time variant of analyze_image() that accepts a BGR numpy array directly.
+
+    Designed for webcam / live-stream use — call with each decoded video frame.
+    Returns the same dict as analyze_image() (including wound_detected).
+
+    Streamlit webcam example:
+        frame_bgr = cv2.cvtColor(webcam_frame_rgb, cv2.COLOR_RGB2BGR)
+        result = analyze_frame(frame_bgr)
+        st.image(cv2.cvtColor(result["annotated_image"], cv2.COLOR_BGR2RGB))
+    """
+    if frame is None or frame.size == 0:
+        raise ValueError("analyze_frame: received empty frame")
+
+    coin = detect_coin(frame)
+    cm_per_px = compute_scale(coin[2], coin_diam_cm) if coin is not None else 0.026
+
+    mask = detect_wound_mask(frame)
+
+    if not is_wound_present(mask, frame.shape):
+        return {
+            "area_cm2":        0.0,
+            "ryb_ratios":      {"red": 0.0, "yellow": 0.0, "black": 0.0},
+            "annotated_image": _make_no_wound_overlay(frame),
+            "coin_found":      coin is not None,
+            "scale_cm_per_px": cm_per_px,
+            "wound_detected":  False,
+            "message":         "No wound detected",
+        }
+
+    area_cm2, _ = compute_wound_area(mask, cm_per_px)
+    ryb = ryb_segment(frame, mask)
+
+    wound_coords = np.where(mask == 255)
+    pixel_labels = None
+    if len(wound_coords[0]) > 0:
+        wound_pixels = frame[wound_coords].reshape(-1, 1, 3).astype(np.uint8)
+        wound_hsv = cv2.cvtColor(wound_pixels, cv2.COLOR_BGR2HSV).reshape(-1, 3)
+        km = KMeans(n_clusters=3, n_init=10, random_state=42)
+        cluster_ids = km.fit_predict(wound_hsv.astype(np.float32))
+        cluster_tissue = [_classify_cluster_hsv(c) for c in km.cluster_centers_]
+        pixel_labels = np.array([cluster_tissue[cid] for cid in cluster_ids])
+
+    scan_result = {"area_cm2": area_cm2, "ryb_ratios": ryb}
+    annotated = draw_overlay(frame, mask, pixel_labels, coin, scan_result)
+
+    return {
+        "area_cm2":        area_cm2,
+        "ryb_ratios":      ryb,
+        "annotated_image": annotated,
+        "coin_found":      coin is not None,
+        "scale_cm_per_px": cm_per_px,
+        "wound_detected":  True,
+        "message":         "Wound detected",
     }
 
 
@@ -416,16 +542,18 @@ def analyze_patient(
     if demo_mode:
         latest = get_latest_wound_data(patient)
         scan = {
-            "area_cm2":        latest["area_cm2"],
-            "ryb_ratios":      latest["ryb_ratios"],
+            "area_cm2":       latest["area_cm2"],
+            "ryb_ratios":     latest["ryb_ratios"],
             "annotated_image": _make_demo_overlay(latest, patient),
+            "wound_detected": True,
         }
     else:
         cv_result = analyze_image(image_path)
         scan = {
-            "area_cm2":        cv_result["area_cm2"],
-            "ryb_ratios":      cv_result["ryb_ratios"],
+            "area_cm2":       cv_result["area_cm2"],
+            "ryb_ratios":     cv_result["ryb_ratios"],
             "annotated_image": cv_result["annotated_image"],
+            "wound_detected": cv_result["wound_detected"],
         }
 
     return {
