@@ -1,25 +1,40 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { clearSession } from '../../api/session'
+import { getPatient } from '../../api/client'
+import { clearSession, setSession } from '../../api/session'
 import type { Patient } from '../../types'
 import Growth from './Growth'
 import History from './History'
 import Scan from './Scan'
 
 const NAV = [
-  { path: '/',        label: 'New Scan',        icon: '◉' },
-  { path: '/history', label: 'Scan History',    icon: '≡' },
-  { path: '/growth',  label: 'Healing Trend',   icon: '↗' },
+  { path: '/',        label: 'New Scan',      icon: '◉' },
+  { path: '/history', label: 'Scan History',  icon: '≡' },
+  { path: '/growth',  label: 'Healing Trend', icon: '↗' },
 ]
 
 interface Props { patient: Patient }
 
-export default function PatientLayout({ patient }: Props) {
+export default function PatientLayout({ patient: initialPatient }: Props) {
+  const [patient, setPatient] = useState<Patient>(initialPatient)
   const navigate  = useNavigate()
   const location  = useLocation()
   const isActive  = (p: string) => location.pathname === p
 
   const logout = () => { clearSession(); window.location.href = '/' }
+
+  // Re-fetch the patient from the API and sync sessionStorage so History/Growth
+  // pick up any scans that were just saved.
+  const refreshPatient = async () => {
+    try {
+      const fresh = await getPatient(patient.patient_id) as Patient
+      setPatient(fresh)
+      setSession(fresh)
+    } catch {
+      // Non-fatal: History will just show the last known data
+    }
+  }
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -87,7 +102,7 @@ export default function PatientLayout({ patient }: Props) {
       {/* Main */}
       <main style={{ flex: 1, overflowY: 'auto', padding: '2rem 2.5rem' }}>
         <Routes>
-          <Route path="/"        element={<Scan patient={patient} />} />
+          <Route path="/"        element={<Scan patient={patient} onScanSaved={refreshPatient} />} />
           <Route path="/history" element={<History patient={patient} />} />
           <Route path="/growth"  element={<Growth patient={patient} />} />
         </Routes>
