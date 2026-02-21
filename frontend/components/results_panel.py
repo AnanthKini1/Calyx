@@ -30,14 +30,20 @@ from utils.analysis_bridge import run_analysis
 # Public entry point
 # ---------------------------------------------------------------------------
 
-def render_results_panel(image_bytes: bytes, patient: dict) -> None:
-    """Run the full pipeline and render results for the given image + patient."""
-
+def render_results_panel(image_bytes: bytes, patient: dict) -> dict | None:
+    """
+    Run the full pipeline and render results for the given image + patient.
+    Returns the result dict so callers can persist the scan, or None on error.
+    """
     cache_key = f"analysis_{patient['patient_id']}_{hash(image_bytes)}"
 
     if cache_key not in st.session_state:
         with st.spinner("Analysing wound…"):
-            result = run_analysis(image_bytes, patient)
+            try:
+                result = run_analysis(image_bytes, patient)
+            except Exception as e:
+                st.error(f"Analysis failed: {e}")
+                return None
         st.session_state[cache_key] = result
     else:
         result = st.session_state[cache_key]
@@ -72,6 +78,8 @@ def render_results_panel(image_bytes: bytes, patient: dict) -> None:
 
     # ── Knowledge graph reasoning ────────────────────────────────────────────
     _render_reasoning_section(kg_out)
+
+    return result
 
 
 # ---------------------------------------------------------------------------
