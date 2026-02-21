@@ -215,6 +215,13 @@ html, body, [data-testid="stApp"] {
     margin: 24px 0;
 }
 
+/* ── Spacing ── */
+.block-container { padding-top: 2.5rem !important; }
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+}
+
 /* ── Streamlit overrides ── */
 .stButton > button {
     background: linear-gradient(135deg, #7C3AED, #8B5CF6) !important;
@@ -223,11 +230,41 @@ html, body, [data-testid="stApp"] {
     border-radius: 10px !important;
     font-weight: 600 !important;
     font-size: 14px !important;
-    padding: 10px 24px !important;
-    transition: opacity 0.2s !important;
+    padding: 10px 20px !important;
+    transition: all 0.2s !important;
     width: 100%;
+    letter-spacing: 0.01em;
 }
-.stButton > button:hover { opacity: 0.85 !important; }
+.stButton > button:hover {
+    opacity: 0.88 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Nav buttons — override purple for sidebar nav */
+[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    color: #707070 !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+    border-color: rgba(139,92,246,0.30) !important;
+    color: #A78BFA !important;
+    background: rgba(139,92,246,0.08) !important;
+}
+
+/* Sign out button in sidebar */
+[data-testid="stSidebar"] [data-testid="stButton"]:last-child > button {
+    background: rgba(255,59,48,0.08) !important;
+    border: 1px solid rgba(255,59,48,0.20) !important;
+    color: #FF6B63 !important;
+}
+[data-testid="stSidebar"] [data-testid="stButton"]:last-child > button:hover {
+    background: rgba(255,59,48,0.14) !important;
+    border-color: rgba(255,59,48,0.35) !important;
+}
 
 .stSelectbox > div > div {
     background: rgba(255,255,255,0.04) !important;
