@@ -13,5 +13,17 @@
       "P004",
       "PE4A46B"
     ]
+  },
+  {
+    "doctor_id": "D8992F4",
+    "role": "doctor",
+    "name": "Dr. Ananth Kini",
+    "email": "aukini@uci.edu",
+    "password_hash": "8f336a1a10187117a06cd466c96dac57f01444676190f473145606c11010597e",
+    "specialty": "Wound Care & Surgery",
+    "patient_ids": [
+      "P50F06F",
+      "P002"
+    ]
   }
 ]

@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { getDoctorPatients } from '../../api/client'
+import { addPatientToDoctor, getAllPatients, getDoctorPatients, removePatientFromDoctor } from '../../api/client'
 import AlertBadge from '../../components/AlertBadge'
-import type { Doctor, PatientWithSummary, Priority } from '../../types'
+import type { Doctor, Patient, PatientWithSummary, Priority } from '../../types'
 
 const PRIORITY_ORDER: Priority[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'OK']
 
@@ -12,10 +12,14 @@ interface Props {
 }
 
 export default function Overview({ doctor, onSelectPatient }: Props) {
-  const [patients, setPatients] = useState<PatientWithSummary[]>([])
-  const [loading, setLoading]   = useState(true)
+  const [patients, setPatients]     = useState<PatientWithSummary[]>([])
+  const [loading, setLoading]       = useState(true)
+  const [managing, setManaging]     = useState(false)
+  const [allPatients, setAllPatients] = useState<Patient[]>([])
+  const [search, setSearch]         = useState('')
+  const [toggling, setToggling]     = useState<string | null>(null)
 
-  useEffect(() => {
+  const fetchAssigned = () =>
     getDoctorPatients(doctor.doctor_id)
       .then(data => setPatients(
         [...data].sort((a, b) => {
@@ -25,7 +29,37 @@ export default function Overview({ doctor, onSelectPatient }: Props) {
         })
       ))
       .finally(() => setLoading(false))
-  }, [doctor.doctor_id])
+
+  useEffect(() => { fetchAssigned() }, [doctor.doctor_id])
+
+  const openManage = () => {
+    setManaging(true)
+    setSearch('')
+    getAllPatients().then(setAllPatients).catch(() => {})
+  }
+
+  const closeManage = () => { setManaging(false); setSearch('') }
+
+  const assignedIds = new Set(patients.map(p => p.patient_id))
+
+  const handleToggle = async (patientId: string, isAssigned: boolean) => {
+    setToggling(patientId)
+    try {
+      if (isAssigned) {
+        await removePatientFromDoctor(doctor.doctor_id, patientId)
+      } else {
+        await addPatientToDoctor(doctor.doctor_id, patientId)
+      }
+      await fetchAssigned()
+    } finally {
+      setToggling(null)
+    }
+  }
+
+  const filtered = allPatients.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.patient_id.toLowerCase().includes(search.toLowerCase())
+  )
 
   const counts = PRIORITY_ORDER.reduce((acc, p) => {
     acc[p] = patients.filter(pt => pt.latest_summary?.priority === p).length
@@ -34,13 +68,99 @@ export default function Overview({ doctor, onSelectPatient }: Props) {
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <p style={{ color: '#a78bfa', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 4px' }}>Dashboard</p>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f1f1f1', margin: '0 0 0.25rem', letterSpacing: '-0.02em' }}>Patient Overview</h1>
-        <p style={{ color: '#6b7280', fontSize: '0.9rem', margin: 0 }}>
-          {patients.length} patients · sorted by clinical priority
-        </p>
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+        style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}
+      >
+        <div>
+          <p style={{ color: '#a78bfa', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 4px' }}>Dashboard</p>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f1f1f1', margin: '0 0 0.25rem', letterSpacing: '-0.02em' }}>Patient Overview</h1>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem', margin: 0 }}>
+            {patients.length} patients · sorted by clinical priority
+          </p>
+        </div>
+        <button
+          onClick={managing ? closeManage : openManage}
+          style={{
+            background: managing ? 'rgba(167,139,250,0.15)' : 'rgba(167,139,250,0.08)',
+            border: `1px solid ${managing ? 'rgba(167,139,250,0.4)' : 'rgba(167,139,250,0.2)'}`,
+            borderRadius: '0.625rem', padding: '0.55rem 1.1rem',
+            color: '#c4b5fd', fontSize: '0.82rem', fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit', marginTop: '0.25rem',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {managing ? '✕  Close' : '＋  Manage Patients'}
+        </button>
       </motion.div>
+
+      {/* Manage panel */}
+      <AnimatePresence>
+        {managing && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginTop: '1.25rem' }}
+            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="glass" style={{ padding: '1.25rem' }}>
+              <p style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 0.75rem' }}>
+                Add or Remove Patients
+              </p>
+              <input
+                className="input"
+                placeholder="Search by name or ID…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ marginBottom: '0.75rem' }}
+                autoFocus
+              />
+              <div style={{ maxHeight: 280, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {filtered.length === 0 && (
+                  <p style={{ color: '#4b5563', fontSize: '0.85rem', textAlign: 'center', padding: '1rem 0' }}>
+                    {allPatients.length === 0 ? 'Loading…' : 'No patients match your search.'}
+                  </p>
+                )}
+                {filtered.map(p => {
+                  const assigned = assignedIds.has(p.patient_id)
+                  const busy     = toggling === p.patient_id
+                  return (
+                    <div key={p.patient_id} style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '0.6rem 0.75rem', borderRadius: '0.5rem',
+                      background: assigned ? 'rgba(167,139,250,0.07)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${assigned ? 'rgba(167,139,250,0.18)' : 'rgba(255,255,255,0.06)'}`,
+                    }}>
+                      <div>
+                        <p style={{ margin: 0, fontWeight: 600, color: '#f1f1f1', fontSize: '0.85rem' }}>{p.name}</p>
+                        <p style={{ margin: 0, color: '#4b5563', fontSize: '0.72rem' }}>
+                          Age {p.age} · {p.patient_id}
+                          {p.comorbidities.length > 0 && ` · ${p.comorbidities.join(', ')}`}
+                        </p>
+                      </div>
+                      <button
+                        disabled={busy}
+                        onClick={() => handleToggle(p.patient_id, assigned)}
+                        style={{
+                          background: assigned ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.08)',
+                          border: `1px solid ${assigned ? 'rgba(239,68,68,0.2)' : 'rgba(34,197,94,0.2)'}`,
+                          borderRadius: '0.5rem', padding: '0.3rem 0.75rem',
+                          color: assigned ? '#f87171' : '#4ade80',
+                          fontSize: '0.75rem', fontWeight: 600,
+                          cursor: busy ? 'default' : 'pointer',
+                          fontFamily: 'inherit', opacity: busy ? 0.5 : 1,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {busy ? '…' : assigned ? 'Remove' : 'Add'}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Priority summary */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
@@ -58,6 +178,10 @@ export default function Overview({ doctor, onSelectPatient }: Props) {
 
       {loading ? (
         <div style={{ textAlign: 'center', color: '#4b5563', marginTop: '3rem' }}>Loading patients…</div>
+      ) : patients.length === 0 ? (
+        <div style={{ textAlign: 'center', color: '#4b5563', marginTop: '3rem', fontSize: '0.9rem' }}>
+          No patients assigned yet. Use <span style={{ color: '#a78bfa' }}>Manage Patients</span> to add some.
+        </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
           {patients.map((p, i) => (
@@ -85,7 +209,6 @@ function PatientCard({ patient: p, index, onClick }: { patient: PatientWithSumma
       onClick={onClick}
       style={{ padding: '1.5rem', cursor: 'pointer', position: 'relative' }}
     >
-      {/* Priority badge */}
       {s?.priority && (
         <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
           <AlertBadge priority={s.priority} size="sm" />
@@ -109,7 +232,6 @@ function PatientCard({ patient: p, index, onClick }: { patient: PatientWithSumma
             />
           </div>
 
-          {/* Mini tissue bars */}
           <div style={{ display: 'flex', gap: 4 }}>
             {[
               { label: 'R', val: s.ryb_ratios.red,    color: '#ef4444' },

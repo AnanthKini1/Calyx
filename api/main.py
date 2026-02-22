@@ -310,6 +310,35 @@ def get_doctor_patients(doctor_id: str):
     return result
 
 
+@app.post("/api/doctors/{doctor_id}/patients/{patient_id}")
+def add_patient_to_doctor(doctor_id: str, patient_id: str):
+    doctors = _load_doctors()
+    patients = _load_patients()
+    if not any(p["patient_id"] == patient_id for p in patients):
+        raise HTTPException(status_code=404, detail="Patient not found")
+    for d in doctors:
+        if d["doctor_id"] == doctor_id:
+            pids = d.setdefault("patient_ids", [])
+            if patient_id not in pids:
+                pids.append(patient_id)
+                _save_doctors(doctors)
+            return _safe_doctor(d)
+    raise HTTPException(status_code=404, detail="Doctor not found")
+
+
+@app.delete("/api/doctors/{doctor_id}/patients/{patient_id}")
+def remove_patient_from_doctor(doctor_id: str, patient_id: str):
+    doctors = _load_doctors()
+    for d in doctors:
+        if d["doctor_id"] == doctor_id:
+            pids = d.get("patient_ids", [])
+            if patient_id in pids:
+                pids.remove(patient_id)
+                _save_doctors(doctors)
+            return _safe_doctor(d)
+    raise HTTPException(status_code=404, detail="Doctor not found")
+
+
 @app.get("/api/doctors")
 def get_all_doctors():
     return [_safe_doctor(d) for d in _load_doctors()]
@@ -347,8 +376,13 @@ async def vision_analyze(
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         vision_result = analyze_frame(frame)
     else:
-        # Demo mode: synthesize image from latest mock scan
-        vision_result = analyze_patient(patient_id)
+        # Demo mode: synthesize image from latest stored scan
+        if not patient or not patient.get("wound_history"):
+            raise HTTPException(
+                status_code=400,
+                detail="No wound history found. Please upload a real image for the first scan.",
+            )
+        vision_result = analyze_patient(patient_id, patient_data=patient)
 
     annotated = vision_result.get("annotated_image")
     img_b64 = ""

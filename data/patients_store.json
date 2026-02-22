@@ -96,6 +96,15 @@
           "yellow": 69.2,
           "black": 0
         }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 0.0,
+        "ryb_ratios": {
+          "red": 0,
+          "yellow": 0,
+          "black": 0
+        }
       }
     ]
   },
@@ -285,5 +294,43 @@
         }
       }
     ]
+  },
+  {
+    "patient_id": "P50F06F",
+    "role": "patient",
+    "name": "Ananth Kini",
+    "email": "ananthkini1@gmail.com",
+    "password_hash": "ecd71870d1963316a97e3ac3408c9835ad8cf0f3c1bc703527c30265534f75ae",
+    "age": 18,
+    "comorbidities": [
+      "Obesity",
+      "Peripheral Artery Disease"
+    ],
+    "blood_glucose": 110.0,
+    "serum_albumin": 3.8,
+    "mobility_score": 9,
+    "post_op_day": 7,
+    "doctor_id": "D001",
+    "wound_history": [
+      {
+        "date": "2026-02-21",
+        "area_cm2": 10.04,
+        "ryb_ratios": {
+          "red": 33.5,
+          "yellow": 66.5,
+          "black": 0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 7.53,
+        "ryb_ratios": {
+          "red": 100,
+          "yellow": 0,
+          "black": 0
+        }
+      }
+    ],
+    "imported_history": {}
   }
 ]
