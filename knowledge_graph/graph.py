@@ -6,6 +6,8 @@ biomarker states, and wound healing outcomes as a directed NetworkX graph.
 Edge weights represent clinical evidence strength (0.0–1.0).
 """
 
+from __future__ import annotations
+
 import networkx as nx
 
 # ---------------------------------------------------------------------------

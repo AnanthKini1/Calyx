@@ -1,6 +1,6 @@
 import type { User } from '../types'
 
-const KEY = 'chroniscan_user'
+const KEY = 'calyx_user'
 
 export function getSession(): User | null {
   try {

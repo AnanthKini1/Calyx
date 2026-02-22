@@ -59,7 +59,7 @@ export default function Login() {
           margin: '0 0 0.75rem',
           letterSpacing: '-0.03em',
         }}>
-          ChroniScan
+          Calyx
         </h1>
         <p style={{ color: '#6b7280', fontSize: '0.95rem', maxWidth: 380, lineHeight: 1.6 }}>
           Sub-visual wound analysis powered by computer vision and clinical knowledge graphs.
@@ -152,9 +152,9 @@ export default function Login() {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
         style={{ marginTop: '2rem', color: '#374151', fontSize: '0.75rem', textAlign: 'center' }}
       >
-        Demo — Patient: <code style={{ color: '#6b7280' }}>maria@chroniscan.com</code> / <code style={{ color: '#6b7280' }}>password123</code>
+        Demo — Patient: <code style={{ color: '#6b7280' }}>maria@calyx.com</code> / <code style={{ color: '#6b7280' }}>password123</code>
         <br />
-        Doctor: <code style={{ color: '#6b7280' }}>priya@chroniscan.com</code> / <code style={{ color: '#6b7280' }}>doctor123</code>
+        Doctor: <code style={{ color: '#6b7280' }}>priya@calyx.com</code> / <code style={{ color: '#6b7280' }}>doctor123</code>
       </motion.p>
     </div>
   )

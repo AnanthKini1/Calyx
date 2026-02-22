@@ -3,7 +3,7 @@ reasoning.py — ChroniScan Clinical Reasoning Engine.
 
 Evaluates wound healing status using rule-based logic combined with
 knowledge graph traversal. Returns a structured result dict suitable
-for direct consumption by the Streamlit frontend.
+for direct consumption by the frontend.
 
 Priority hierarchy (highest wins):
   CRITICAL > HIGH > MEDIUM > LOW > OK

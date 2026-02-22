@@ -50,7 +50,7 @@ export default function PatientLayout({ patient: initialPatient }: Props) {
       >
         {/* Logo */}
         <div style={{ padding: '0 1.5rem', marginBottom: '2rem' }}>
-          <p style={{ fontSize: '0.65rem', color: '#a78bfa', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0 }}>ChroniScan</p>
+          <p style={{ fontSize: '0.65rem', color: '#a78bfa', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0 }}>Calyx</p>
           <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f1f1f1', margin: '2px 0 0', letterSpacing: '-0.02em' }}>Patient Portal</p>
         </div>
 
