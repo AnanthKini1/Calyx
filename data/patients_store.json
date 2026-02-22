@@ -3,7 +3,7 @@
     "patient_id": "P001",
     "role": "patient",
     "name": "Maria Santos",
-    "email": "maria@chroniscan.com",
+    "email": "maria@calyx.com",
     "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
     "age": 54,
     "comorbidities": [
@@ -76,7 +76,7 @@
     "patient_id": "P002",
     "role": "patient",
     "name": "James Okafor",
-    "email": "james@chroniscan.com",
+    "email": "james@calyx.com",
     "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
     "age": 67,
     "comorbidities": [
@@ -142,7 +142,7 @@
     "patient_id": "P003",
     "role": "patient",
     "name": "Linda Chu",
-    "email": "linda@chroniscan.com",
+    "email": "linda@calyx.com",
     "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
     "age": 61,
     "comorbidities": [
@@ -206,7 +206,7 @@
     "patient_id": "P004",
     "role": "patient",
     "name": "Robert Vance",
-    "email": "robert@chroniscan.com",
+    "email": "robert@calyx.com",
     "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
     "age": 73,
     "comorbidities": [
@@ -258,68 +258,5 @@
         }
       }
     ]
-  },
-  {
-    "patient_id": "PE4A46B",
-    "role": "patient",
-    "name": "Ananth Kini",
-    "email": "ananth@chroniscan.com",
-    "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
-    "age": 36,
-    "comorbidities": [
-      "Obesity"
-    ],
-    "blood_glucose": 110.0,
-    "serum_albumin": 3.8,
-    "mobility_score": 7,
-    "post_op_day": 7,
-    "doctor_id": "D001",
-    "imported_history": {},
-    "wound_history": [
-      {
-        "date": "2026-02-21",
-        "area_cm2": 75.33,
-        "ryb_ratios": {
-          "red": 100.0,
-          "yellow": 0.0,
-          "black": 0.0
-        }
-      }
-    ]
-  },
-  {
-    "patient_id": "P96F24D",
-    "role": "patient",
-    "name": "Ananth",
-    "email": "ananthkini1@gmail.com",
-    "password_hash": "ecd71870d1963316a97e3ac3408c9835ad8cf0f3c1bc703527c30265534f75ae",
-    "age": 45,
-    "comorbidities": [],
-    "blood_glucose": 110.0,
-    "serum_albumin": 3.8,
-    "mobility_score": 7,
-    "post_op_day": 7,
-    "doctor_id": "D001",
-    "wound_history": [
-      {
-        "date": "2026-02-21",
-        "area_cm2": 10.04,
-        "ryb_ratios": {
-          "red": 33.5,
-          "yellow": 66.5,
-          "black": 0
-        }
-      },
-      {
-        "date": "2026-02-21",
-        "area_cm2": 10.04,
-        "ryb_ratios": {
-          "red": 33.5,
-          "yellow": 66.5,
-          "black": 0
-        }
-      }
-    ],
-    "imported_history": {}
   }
 ]
