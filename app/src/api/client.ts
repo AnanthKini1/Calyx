@@ -9,8 +9,8 @@ export const login = (email: string, password: string) =>
 
 export const registerPatient = (data: {
   email: string; password: string; name: string; age: number
-  comorbidities: string[]; blood_glucose: number; serum_albumin: number
-  mobility_score: number; post_op_day: number; doctor_id?: string
+  comorbidities: string[]; blood_glucose?: number; serum_albumin?: number
+  mobility_score?: number; post_op_day?: number; doctor_id?: string
 }) => api.post<Patient>('/api/auth/register/patient', data).then(r => r.data)
 
 export const registerDoctor = (data: {
@@ -21,6 +21,9 @@ export const registerDoctor = (data: {
 export const getPatient = (id: string) =>
   api.get<Patient>(`/api/patients/${id}`).then(r => r.data)
 
+export const getAllPatients = () =>
+  api.get<Patient[]>('/api/patients').then(r => r.data)
+
 export const getPatientAnalysis = (id: string) =>
   api.get<AnalysisResult>(`/api/patients/${id}/analysis`).then(r => r.data)
 
@@ -30,6 +33,12 @@ export const getDoctors = () =>
 // ── Doctor ────────────────────────────────────────────────────────────────────
 export const getDoctorPatients = (doctorId: string) =>
   api.get<PatientWithSummary[]>(`/api/doctors/${doctorId}/patients`).then(r => r.data)
+
+export const addPatientToDoctor = (doctorId: string, patientId: string) =>
+  api.post<Doctor>(`/api/doctors/${doctorId}/patients/${patientId}`).then(r => r.data)
+
+export const removePatientFromDoctor = (doctorId: string, patientId: string) =>
+  api.delete<Doctor>(`/api/doctors/${doctorId}/patients/${patientId}`).then(r => r.data)
 
 // ── Vision scan ───────────────────────────────────────────────────────────────
 export const runScan = async (

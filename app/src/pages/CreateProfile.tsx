@@ -132,11 +132,11 @@ function PatientForm({ error: _e, setError, loading, setLoading, onSuccess }: Fo
   const [name, setName]         = useState('')
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [age, setAge]           = useState(45)
-  const [glucose, setGlucose]   = useState(110)
-  const [albumin, setAlbumin]   = useState(3.8)
-  const [mobility, setMobility] = useState(7)
-  const [podDay, setPodDay]     = useState(7)
+  const [age, setAge]           = useState('')
+  const [glucose, setGlucose]   = useState('')
+  const [albumin, setAlbumin]   = useState('')
+  const [mobility, setMobility] = useState('')
+  const [podDay, setPodDay]     = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [doctors, setDoctors]   = useState<Doctor[]>([])
   const [doctorId, setDoctorId] = useState<string>('')
@@ -150,13 +150,17 @@ function PatientForm({ error: _e, setError, loading, setLoading, onSuccess }: Fo
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !email || !password) { setError('Name, email, and password are required.'); return }
+    if (!name || !email || !password || !age) { setError('Name, email, password, and age are required.'); return }
     setLoading(true); setError('')
     try {
       const user = await registerPatient({
-        name, email, password, age, comorbidities: selected,
-        blood_glucose: glucose, serum_albumin: albumin,
-        mobility_score: mobility, post_op_day: podDay,
+        name, email, password,
+        age: parseInt(age, 10),
+        comorbidities: selected,
+        ...(glucose   ? { blood_glucose:   parseFloat(glucose) }   : {}),
+        ...(albumin   ? { serum_albumin:   parseFloat(albumin) }   : {}),
+        ...(mobility  ? { mobility_score:  parseInt(mobility, 10) } : {}),
+        ...(podDay    ? { post_op_day:     parseInt(podDay, 10) }   : {}),
         doctor_id: doctorId || undefined,
       })
       onSuccess(user)
@@ -175,7 +179,7 @@ function PatientForm({ error: _e, setError, loading, setLoading, onSuccess }: Fo
         </FormField>
         <FormField label="Age" small>
           <input className="input" type="number" min={1} max={120} value={age}
-            onChange={e => setAge(Number(e.target.value))} />
+            placeholder="e.g. 45" onChange={e => setAge(e.target.value)} />
         </FormField>
       </Row>
 
@@ -190,19 +194,22 @@ function PatientForm({ error: _e, setError, loading, setLoading, onSuccess }: Fo
       <SectionLabel>Clinical (optional)</SectionLabel>
       <Row>
         <FormField label="Blood Glucose (mg/dL)">
-          <input className="input" type="number" value={glucose} onChange={e => setGlucose(Number(e.target.value))} />
+          <input className="input" type="number" value={glucose} placeholder="e.g. 110"
+            onChange={e => setGlucose(e.target.value)} />
         </FormField>
         <FormField label="Serum Albumin (g/dL)">
-          <input className="input" type="number" step="0.1" value={albumin} onChange={e => setAlbumin(Number(e.target.value))} />
+          <input className="input" type="number" step="0.1" value={albumin} placeholder="e.g. 3.8"
+            onChange={e => setAlbumin(e.target.value)} />
         </FormField>
       </Row>
       <Row>
-        <FormField label={`Mobility: ${mobility}/10`}>
-          <input type="range" min={0} max={10} value={mobility} onChange={e => setMobility(Number(e.target.value))}
-            style={{ width: '100%', accentColor: '#a78bfa' }} />
+        <FormField label="Mobility Score (0–10)">
+          <input className="input" type="number" min={0} max={10} value={mobility} placeholder="e.g. 7"
+            onChange={e => setMobility(e.target.value)} />
         </FormField>
         <FormField label="Days Since Surgery">
-          <input className="input" type="number" value={podDay} onChange={e => setPodDay(Number(e.target.value))} />
+          <input className="input" type="number" min={0} value={podDay} placeholder="e.g. 7"
+            onChange={e => setPodDay(e.target.value)} />
         </FormField>
       </Row>
 
