@@ -69,6 +69,33 @@
           "yellow": 0,
           "black": 0
         }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 5.05,
+        "ryb_ratios": {
+          "red": 100,
+          "yellow": 0,
+          "black": 0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 9.85,
+        "ryb_ratios": {
+          "red": 100,
+          "yellow": 0,
+          "black": 0
+        }
+      },
+      {
+        "date": "2026-02-21",
+        "area_cm2": 9.91,
+        "ryb_ratios": {
+          "red": 30.8,
+          "yellow": 69.2,
+          "black": 0
+        }
       }
     ]
   },
