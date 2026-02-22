@@ -15,9 +15,9 @@ const card = (i: number) => ({
   transition: { delay: i * 0.1, duration: 0.45 },
 })
 
-interface Props { patient: Patient }
+interface Props { patient: Patient; onScanSaved?: () => void }
 
-export default function Scan({ patient }: Props) {
+export default function Scan({ patient, onScanSaved }: Props) {
   const [file, setFile]         = useState<File | null>(null)
   const [preview, setPreview]   = useState<string | null>(null)
   const [result, setResult]     = useState<AnalysisResult | null>(null)
@@ -64,6 +64,7 @@ export default function Scan({ patient }: Props) {
         ryb_ratios: result.ryb_ratios,
       })
       setSaved(true)
+      onScanSaved?.()
     } catch {
       setError('Failed to save scan.')
     }
