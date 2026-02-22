@@ -3,4 +3,4 @@ builder = "nixpacks"
 buildCommand = "npm install && npm run build"
 
 [deploy]
-startCommand = "./node_modules/.bin/serve -s dist -l tcp://0.0.0.0:$PORT"
+startCommand = "node server.js"
