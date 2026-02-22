@@ -2,7 +2,7 @@
 
 **The clinical middleman turning wound photos into life-saving data.**
 
-**[Live Demo](https://calyx.up.railway.app/) · [Devpost](https://devpost.com/software/calyx-7hnod6)**
+**[Devpost](https://devpost.com/software/calyx-7hnod6)**
 
 ---
 
