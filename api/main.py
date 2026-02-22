@@ -1,5 +1,5 @@
 """
-api/main.py — ChroniScan FastAPI Backend
+api/main.py — Calyx FastAPI Backend
 
 Provides REST endpoints consumed by the React frontend.
 Run with:  uvicorn api.main:app --reload --port 8000
@@ -65,11 +65,19 @@ def _hash(password: str) -> str:
 # App
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="ChroniScan API", version="1.0.0")
+app = FastAPI(title="Calyx API", version="1.0.0")
+
+# ALLOWED_ORIGINS env var lets Railway (or any host) inject the frontend URL
+# at runtime without rebuilding. Falls back to localhost for local dev.
+_raw_origins = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173",
+)
+_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
