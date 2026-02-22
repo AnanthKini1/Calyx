@@ -512,16 +512,16 @@ def analyze_frame(
 def analyze_patient(
     patient_id: str,
     image_path: str | None = None,
+    patient_data: dict | None = None,
 ) -> dict:
     """
-    Return a full clinical dict fusing CV scan results with mock patient data.
+    Return a full clinical dict fusing CV scan results with patient data.
 
-    If image_path is None → demo mode: uses latest mock wound scan.
+    If image_path is None → demo mode: uses latest wound scan from history.
     If image_path is provided → runs the real CV pipeline on that photo.
 
-    Streamlit usage:
-        result = analyze_patient("P002")
-        st.image(cv2.cvtColor(result["scan"]["annotated_image"], cv2.COLOR_BGR2RGB))
+    patient_data can be supplied directly (e.g. from the JSON store) to avoid
+    requiring the patient to exist in the mock PATIENTS list.
 
     Returns:
       {
@@ -533,7 +533,7 @@ def analyze_patient(
         "demo_mode"     : bool,
       }
     """
-    patient = get_patient_by_id(patient_id)
+    patient = patient_data if patient_data is not None else get_patient_by_id(patient_id)
     if patient is None:
         raise ValueError(f"Unknown patient_id: {patient_id!r}")
 
