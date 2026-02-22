@@ -2,6 +2,8 @@
 
 **The clinical middleman turning wound photos into life-saving data.**
 
+**[Live Demo](https://calyx.up.railway.app/) · [Devpost](https://devpost.com/software/calyx-7hnod6)**
+
 ---
 
 ## What is Calyx?
@@ -53,9 +55,11 @@ Calyx uses **computer vision** to measure wound area and tissue health from a ph
 | Backend | FastAPI + Uvicorn |
 | Computer Vision | OpenCV + scikit-learn (K-Means) |
 | Knowledge Graph | NetworkX |
+| Auth | SHA-256 password hashing, role-based access (patient/doctor) |
 | Data | JSON file store (patients, doctors) |
 | Animation | Framer Motion |
 | Charts | Recharts |
+| Deployment | Railway (nixpacks) |
 
 ---
 
