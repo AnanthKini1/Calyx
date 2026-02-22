@@ -15,8 +15,6 @@ The platform is powered by a **Python** backend using:
 * **The Brain:** _NetworkX_ to map clinical comorbidities.
 * **The Interface:** A **Streamlit** frontend featuring a patient webcam portal and a doctor dashboard with **Plotly** healing charts.
 
-![Calyx System Architecture Diagram]
-
 ## Challenges we ran into
 * **Calibration:** Achieving accuracy across different cameras was difficult. We used a _calibration coin_ as a real-world reference to calculate precise area in cm2.
 * **Logic Mapping:** Translating medical literature into a **Directed Graph** required complex weighting to ensure _BFS traversal_ prioritized life-critical risks.
