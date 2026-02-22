@@ -147,15 +147,6 @@ export default function Login() {
         </div>
       </motion.div>
 
-      {/* Demo hint */}
-      <motion.p
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        style={{ marginTop: '2rem', color: '#374151', fontSize: '0.75rem', textAlign: 'center' }}
-      >
-        Demo — Patient: <code style={{ color: '#6b7280' }}>maria@calyx.com</code> / <code style={{ color: '#6b7280' }}>password123</code>
-        <br />
-        Doctor: <code style={{ color: '#6b7280' }}>priya@calyx.com</code> / <code style={{ color: '#6b7280' }}>doctor123</code>
-      </motion.p>
     </div>
   )
 }
